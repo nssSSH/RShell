@@ -1,3 +1,4 @@
+use colored::Colorize;
 use std::process::Command;
 use std::{io, io::Write};
 
@@ -9,14 +10,29 @@ fn input() -> String {
     input.trim().to_string()
 }
 
+fn print_colored(text: &str, colour: &str) {
+    match colour {
+        "red" => print!("{}", text.red()),
+        "green" => print!("{}", text.green()),
+        "yellow" => print!("{}", text.yellow()),
+        "cyan" => print!("{}", text.cyan()),
+        "purple" => print!("{}", text.purple()),
+        _ => print!("{} Color not supported!", text.red()),
+    };
+}
+
 fn main() {
     loop {
-        print!("$ ");
+        print_colored("$ ", "red");
         io::stdout().flush().unwrap();
 
-        let mut parts = input();
-        let mut parts = parts.split_whitespace();
+        let input_line = input();
+        let mut parts = input_line.split_whitespace();
         let command = parts.next().unwrap();
+
+        // match command {
+        //     "rshell-color-red"
+        //  }
 
         let mut child = Command::new(command).args(parts).spawn().unwrap();
 
