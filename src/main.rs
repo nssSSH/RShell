@@ -29,11 +29,6 @@ fn main() {
         let input_line = input();
         let mut parts = input_line.split_whitespace();
         let command = parts.next().unwrap();
-
-        // match command {
-        //     "rshell-color-red"
-        //  }
-
         let mut child = Command::new(command).args(parts).spawn().unwrap();
 
         child.wait();
