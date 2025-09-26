@@ -1,6 +1,8 @@
 use colored::Colorize;
 use std::process::Command;
 use std::{io, io::Write};
+use std::env;
+use std::path::PathBuf;
 
 fn input() -> String {
     let mut input = String::new();
@@ -20,11 +22,10 @@ fn print_colored(text: &str, colour: &str) {
         _ => print!("{} Color not supported!", text.red()),
     };
 }
-/*
-fn shell_cd(path: Option<&str>) {
-    
+
+fn shell_pwd()  -> io::Result<PathBuf>{
+     env::current_dir()   
 }
-*/
 
 fn main() {
     loop {
@@ -34,8 +35,20 @@ fn main() {
         let input_line = input();
         let mut parts = input_line.split_whitespace();
         let command = parts.next().unwrap();
-        let mut child = Command::new(command).args(parts).spawn().unwrap();
 
-        child.wait();
+        if command == "pwd" {
+            match shell_pwd(){
+                Ok(path) => println!("{}", path.display()),
+                Err(e) => eprintln!("{}", e)            }
+        } else if command == "exit" {
+            break
+        } else {
+            let mut child = Command::new(command)
+                .args(parts)
+                .spawn()
+                .unwrap();
+
+            child.wait();
+        }
     }
 }
