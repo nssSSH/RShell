@@ -1,22 +1,50 @@
-name: Rust
+name: Release RShell
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-env:
-  CARGO_TERM_COLOR: always
+    tags:
+      - "v*.*.*"   # triggers on tags like v0.1.0
 
 jobs:
-  build:
-
+  build-and-release:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Build release binary
+        run: cargo build --release
+
+      - name: Prepare release artifact
+        run: |
+          mkdir -p artifacts
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            cp target/release/rshell.exe artifacts/
+          else
+            cp target/release/rshell artifacts/
+          fi
+
+      - name: Create GitHub Release
+        id: gh_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
