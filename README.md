@@ -6,6 +6,6 @@ Features to add:
 - [X] Multiline support
 - [X] Handle args
 - [X] Add colors
-- [ ] Add support for built in commands such as cd, pwd etc. Make it Unix-like.
+- [X] Add support for built in commands such as cd, pwd etc. Make it Unix-like.
 - [ ] Add error handling
 
