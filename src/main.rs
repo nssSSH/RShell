@@ -47,15 +47,22 @@ fn shell_cd<P: AsRef<Path>>(path: P) {
     }
 }
 
+const BUILT_IN_COMMANDS: [&str; 5] = ["cd", "cd -", "cd <path>", "pwd", "exit"];
 
 fn main() {
+    ctrlc::set_handler(move || {
+        print!("");
+    }).expect("Something went wrong while setting CTRL+C handler.");
     loop {
         print_colored("$ ", "red");
         io::stdout().flush().unwrap();
 
         let input_line = input();
         let mut parts = input_line.split_whitespace();
-        let command = parts.next().unwrap();
+        let command = match parts.next() {
+            Some(cmd) => cmd,
+            None => continue
+        };
         let args: Vec<&str> = parts.clone().collect();
         if command == "pwd" {
             match shell_pwd(){
@@ -75,6 +82,8 @@ fn main() {
                 
         } else if command == "exit"  {
             break
+        } else if command == "help" {
+            println!("Built in commands: {:?}", BUILT_IN_COMMANDS);
         } else {
             let mut child = Command::new(command)
                 .args(parts)
