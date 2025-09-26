@@ -2,7 +2,7 @@ use colored::Colorize;
 use std::process::Command;
 use std::{io, io::Write};
 use std::env;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 fn input() -> String {
     let mut input = String::new();
@@ -41,6 +41,13 @@ fn shell_cd_home() {
     }
 }
 
+fn shell_cd<P: AsRef<Path>>(path: P) {
+    if let Err(e) = std::env::set_current_dir(path) {
+        eprintln!("{e}");
+    }
+}
+
+
 fn main() {
     loop {
         print_colored("$ ", "red");
@@ -59,9 +66,11 @@ fn main() {
                 shell_cd_home();
             } else if args[0] == "-" {
                 shell_cd_minus();
+            } else if args[0] != "-"{
+                shell_cd(args[0]);
+                
             } else {
-                // TODO: Implement this
-                println!("Yay");
+                println!("cd..");
             }
                 
         } else if command == "exit"  {
