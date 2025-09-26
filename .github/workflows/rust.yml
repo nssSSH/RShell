@@ -11,6 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,13 +26,19 @@ jobs:
       - name: Build release binary
         run: cargo build --release
 
-      - name: Prepare release artifact
+      - name: Prepare artifact folder
+        run: mkdir -p artifacts
+
+      - name: Copy and rename binary
         run: |
-          mkdir -p artifacts
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            cp target/release/rshell.exe artifacts/
+          OS=${{ matrix.os }}
+          VERSION=${GITHUB_REF#refs/tags/}
+          if [ "$OS" == "windows-latest" ]; then
+            cp target/release/rshell.exe artifacts/rshell-$VERSION-windows.exe
+          elif [ "$OS" == "macos-latest" ]; then
+            cp target/release/rshell artifacts/rshell-$VERSION-macos
           else
-            cp target/release/rshell artifacts/
+            cp target/release/rshell artifacts/rshell-$VERSION-linux
           fi
 
       - name: Create GitHub Release
