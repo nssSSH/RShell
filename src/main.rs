@@ -27,6 +27,20 @@ fn shell_pwd()  -> io::Result<PathBuf>{
      env::current_dir()   
 }
 
+fn shell_cd_minus() {
+    match std::env::var("OLDPWD") {
+        Ok(old_pwd) => std::env::set_current_dir(&old_pwd).unwrap(),
+        Err(e) => eprintln!("{e}")
+    }    
+}
+
+fn shell_cd_home() {
+    match std::env::var("HOME") {
+        Ok(home) => std::env::set_current_dir(&home).unwrap(),
+        Err(e) => eprintln!("{e}")
+    }
+}
+
 fn main() {
     loop {
         print_colored("$ ", "red");
@@ -35,12 +49,22 @@ fn main() {
         let input_line = input();
         let mut parts = input_line.split_whitespace();
         let command = parts.next().unwrap();
-
+        let args: Vec<&str> = parts.clone().collect();
         if command == "pwd" {
             match shell_pwd(){
                 Ok(path) => println!("{}", path.display()),
                 Err(e) => eprintln!("{}", e)            }
-        } else if command == "exit" {
+        } else if command == "cd"{
+            if args.len() == 0 {
+                shell_cd_home();
+            } else if args[0] == "-" {
+                shell_cd_minus();
+            } else {
+                // TODO: Implement this
+                println!("Yay");
+            }
+                
+        } else if command == "exit"  {
             break
         } else {
             let mut child = Command::new(command)
