@@ -20,6 +20,11 @@ fn print_colored(text: &str, colour: &str) {
         _ => print!("{} Color not supported!", text.red()),
     };
 }
+/*
+fn shell_cd(path: Option<&str>) {
+    
+}
+*/
 
 fn main() {
     loop {
